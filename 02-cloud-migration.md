@@ -1,42 +1,42 @@
-# Scenario 2. Cloud Migration
+# シナリオ2. クラウド移行
 
-## "The Lift, the Shift, and the 4am Call"
+## 「リフトとシフト、そして午前4時の呼び出し」
 
-Contoso Financial runs three workloads on-prem: a customer-facing web app, a nightly batch reconciliation job, and a reporting database that five teams query directly. The CFO signed the cloud contract. The CTO wants "cloud-native, not lift-and-shift." Compliance wants residency controls. SRE wants sleep. They are not aligned.
+Contoso Financial はオンプレミスで3つのワークロードを動かしています。顧客向けの Web アプリ、夜間バッチの照合ジョブ、そして5つのチームが直接クエリを投げるレポーティングデータベースです。CFO はクラウド契約にサインしました。CTO は「リフト&シフトではなくクラウドネイティブ」を望んでいます。コンプライアンス部門はデータ所在地の管理を求め、SRE はとにかく眠りたい。全員の足並みは揃っていません。
 
-You pick the target cloud and the migration pattern. You won't deploy live. Produce cloud-ready artifacts that run locally with production-equivalent architecture. Docker Compose with services mapped to cloud primitives: MinIO stands in for S3, Postgres for RDS, Redis for ElastiCache. Name things accordingly.
+移行先クラウドと移行パターンは自由に選べます。実環境へのデプロイは行いません。その代わり、本番相当のアーキテクチャでローカルに動く、クラウド対応のアーティファクトを作ってください。具体的には、クラウドのプリミティブに対応付けた Docker Compose です。S3 の代役に MinIO、RDS に Postgres、ElastiCache に Redis。命名もそれに合わせます。
 
-The auditor will read your IaC, the CTO will read your ADRs, and ops will run your runbook at 4am. Design for all three readers.
-
----
-
-## Challenges
-
-Waypoints, not a checklist. Pick the ones you want to pursue.
-
-1. **The Memo.** *(PM/BA)* The decision memo. Lift-and-shift first then optimize, or refactor on the way in? Pick a side. Make the case. Name the risks you're accepting and who bears them. One page, no hedging. Legal and the CFO are in the audience.
-
-2. **The Discovery.** *(Architect)* Surface the real current state: the three workloads, their configs, and the ugly inter-dependencies nobody documented (a hardcoded IP, a shared filesystem mount, a cron pinging an endpoint to keep a cache warm). Role-play the stakeholder interviews with Claude if it helps draw the details out. Whatever you uncover should visibly shape the architecture choices in the next challenge.
-
-3. **The Options.** *(Architect)* A handful of candidate target architectures on your chosen cloud, scored on cost, risk, speed, and operability, with a recommendation. Reference actual services by name (ECS versus EKS, App Service versus Container Apps, your call). Commit the recommendation as an ADR. A per-workload `CLAUDE.md` starts paying off here: the batch folder and the web-app folder deserve different guidance for Claude when someone edits them.
-
-4. **The Container.** *(Dev)* Containerize the web app. Multi-stage build, non-root user, health check endpoint. Runs locally via `docker compose`. The same image would deploy to your target cloud with a config swap rather than a rebuild.
-
-5. **The Foundation.** *(Platform)* Infrastructure-as-code for the full target architecture. It won't deploy to a live cloud, but it needs to *read right*: idempotent, no hardcoded secrets, a state-file story that isn't "check it in." A `PreToolUse` hook that deterministically blocks any Claude edit writing a plaintext secret into IaC is a cheap, high-value guardrail. Pair it with a prompt in `CLAUDE.md` that says "prefer the secret manager for X" and a short ADR on why the block is a hook and the preference is a prompt.
-
-6. **The Proof.** *(Quality)* A validation suite that defines "migration succeeded": smoke tests, contract tests, data-integrity checks. Runs against the local stand-in now, runs again against the real cloud post-cutover. At least a few assertions should specifically catch the undocumented things from Discovery, so the validation isn't just theatre.
-
-7. **The Scorecard.** *(Quality)* An eval harness for Claude's IaC and migration outputs, because same prompt plus same workload doesn't mean same Terraform. A golden set of known-good IaC snippets, known-bad patterns (over-permissive IAM, hardcoded secrets, missing tags, open security groups), and reference migration plans. Metrics: does Claude's IaC match the golden standard, does it correctly flag the bad patterns, and how often does it confidently propose something the hook would block. Runs in CI so the non-interactive Claude review has a score to defend rather than a vibe.
-
-8. **The Undo.** *(Stretch)* Rollback plan per workload, per cutover stage. Exact sequence, not a diagram. The one nobody wants to write but everyone needs at 4am. Walk through it at least once so it isn't purely theoretical.
-
-9. **The Survey.** *(Stretch, agentic)* Parallel discovery with Task subagents. One subagent per workload (web app, batch job, reporting database), each reading configs, probing dependencies, and emitting a structured current-state report. A coordinator merges them into a single discovery doc. Pass scope explicitly in each Task prompt, since subagents don't inherit coordinator context. The merged output should surface at least one cross-workload coupling a single-pass analysis would miss, and it should visibly sharpen the architecture choices in The Options.
+監査人は IaC を読み、CTO は ADR を読み、運用チームは午前4時にランブックを実行します。この3種類の読者すべてに向けて設計してください。
 
 ---
 
-**Cert domains this scenario stresses:**
+## チャレンジ
 
-- **Claude Code Config.** Per-workload `CLAUDE.md`; non-interactive Claude in CI for IaC review; Plan Mode for cutover steps.
-- **Context Management.** Hook plus prompt guidance for secrets in IaC; escalation rules for the cutover decision; stratified sampling and false-confidence rate on the IaC eval (via The Scorecard).
-- **Tool Design.** MCP server over the local cloud stand-in, with tool descriptions that teach the agent what each tool does *not* do.
-- **Agentic Architecture.** Task subagents for parallel workload discovery, with explicit context passed in each Task call (optional, via The Survey).
+チェックリストではなく、道しるべです。追いかけたいものを選んでください。
+
+1. **メモ。** *(PM/BA)* 意思決定メモです。まずリフト&シフトして後から最適化するのか、移行と同時にリファクタリングするのか。どちらかに立場を決め、論拠を示し、受け入れるリスクとその負担者を名指ししてください。1ページ、逃げ口上なし。読者席には法務と CFO が座っています。
+
+2. **ディスカバリー。** *(アーキテクト)* 現状の実態をあぶり出します。3つのワークロード、その設定、そして誰も文書化しなかった厄介な相互依存(ハードコードされた IP、共有ファイルシステムのマウント、キャッシュを温めるためにエンドポイントを叩き続ける cron)。詳細を引き出すには、Claude を相手にステークホルダー・インタビューをロールプレイするのも有効です。ここで掘り当てた事実が、次のチャレンジでのアーキテクチャ選定に目に見える形で反映されるべきです。
+
+3. **選択肢。** *(アーキテクト)* 選んだクラウド上での候補アーキテクチャを数案挙げ、コスト、リスク、スピード、運用性で採点し、推薦案を添えます。実在のサービス名で語ってください(ECS か EKS か、App Service か Container Apps か、選択は自由です)。推薦案は ADR としてコミットします。ワークロードごとの `CLAUDE.md` がここで効き始めます。バッチのフォルダと Web アプリのフォルダとでは、編集時に Claude へ与えるべきガイダンスが違うからです。
+
+4. **コンテナ。** *(開発)* Web アプリをコンテナ化します。マルチステージビルド、非 root ユーザー、ヘルスチェック用エンドポイント。`docker compose` でローカル起動でき、同じイメージがリビルドなしの設定差し替えだけで移行先クラウドにデプロイできる形を目指します。
+
+5. **土台。** *(プラットフォーム)* ターゲットアーキテクチャ全体の Infrastructure-as-code。実際のクラウドにはデプロイしませんが、*読んで正しい*ものである必要があります。冪等であること、ハードコードされたシークレットがないこと、ステートファイルの扱いが「リポジトリにコミットする」ではないこと。Claude が IaC に平文シークレットを書き込もうとする編集を決定論的にブロックする `PreToolUse` フックは、手軽なわりに効果の高いガードレールです。`CLAUDE.md` の「X にはシークレットマネージャーを優先する」というプロンプトと組み合わせ、なぜブロックはフックで、優先の指示はプロンプトなのかを短い ADR にまとめてください。
+
+6. **証明。** *(品質)* 「移行成功」を定義する検証スイート。スモークテスト、コントラクトテスト、データ整合性チェック。今はローカルの代役スタックに対して走り、カットオーバー後には本物のクラウドに対してもう一度走ります。少なくともいくつかのアサーションは、「ディスカバリー」で見つけた文書化されていなかった事柄を狙い撃ちしてください。検証がただのお芝居で終わらないように。
+
+7. **スコアカード。** *(品質)* Claude が生成する IaC と移行アウトプットを測る eval ハーネス。同じプロンプトと同じワークロードでも、同じ Terraform が出てくるとは限らないからです。既知の良い IaC スニペットのゴールデンセット、既知の悪いパターン(過剰な権限の IAM、ハードコードされたシークレット、タグの欠落、開きっぱなしのセキュリティグループ)、参照用の移行計画を用意します。メトリクスは、Claude の IaC がゴールデンスタンダードに合致するか、悪いパターンを正しく指摘できるか、そしてフックにブロックされるはずの提案を自信満々に出してくる頻度。CI で回しておけば、非対話モードの Claude によるレビューを、雰囲気ではなく数字で守れるようになります。
+
+8. **切り戻し。** *(発展)* ワークロード別、カットオーバー段階別のロールバック計画。図ではなく、正確な手順書として書きます。誰も書きたがらないのに、午前4時には全員が必要とする、あの文書です。机上の空論にしないために、最低1回は通しで確認してください。
+
+9. **調査隊。** *(発展、エージェント)* Task サブエージェントによる並列ディスカバリー。ワークロード(Web アプリ、バッチジョブ、レポーティングデータベース)ごとにサブエージェントを1つ立て、それぞれが設定を読み、依存関係を探り、構造化された現状レポートを出力します。コーディネーターがそれらを1つのディスカバリードキュメントに統合します。サブエージェントはコーディネーターのコンテキストを引き継がないため、スコープは各 Task プロンプトで明示的に渡してください。統合後のアウトプットからは、一発の分析では見落とすようなワークロード横断の結合が少なくとも1つ浮かび上がり、「選択肢」でのアーキテクチャ判断が目に見えて研ぎ澄まされるはずです。
+
+---
+
+**このシナリオで鍛えられる認定試験ドメイン:**
+
+- **Claude Code の設定。** ワークロードごとの `CLAUDE.md`。IaC レビューのための CI 上の非対話モード Claude。カットオーバー手順のための Plan Mode。
+- **コンテキスト管理。** IaC のシークレットに対するフックとプロンプトの併用。カットオーバー判断のエスカレーションルール。IaC eval における層化サンプリングと誤確信率(「スコアカード」経由)。
+- **ツール設計。** ローカルのクラウド代役スタックの上に立てる MCP サーバー。各ツールが*何をしないか*までエージェントに教える説明文。
+- **エージェントアーキテクチャ。** ワークロードを並列に調査する Task サブエージェント。各 Task 呼び出しでの明示的なコンテキスト受け渡し(任意、「調査隊」経由)。
