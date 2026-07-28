@@ -1,63 +1,63 @@
-# Scenario 4. Data & Analytics
+# シナリオ4. データ&アナリティクス
 
-## "40 Dashboards, One Metric, Four Answers"
+## 「ダッシュボード40枚、指標1つ、答えは4通り」
 
-Somewhere in the business there are 40 dashboards across three BI tools. Executives make decisions by gut because the numbers never match. One metric, the one everyone says is *the* metric, is calculated four different ways depending on who you ask. A new VP wants one number, one definition, defended in a room full of people who each think their version is right, plus the ability to ask questions in plain English without waiting a week for analytics.
+社内のどこかに、3つの BI ツールにまたがる40枚のダッシュボードがあります。数字が一向に一致しないので、経営陣は勘で意思決定をしています。誰もが「これこそ*本命*の指標だ」と言うその1つの指標が、聞く相手によって4通りの方法で計算されている。新任の VP が求めているのは、1つの数字と1つの定義、そしてそれを「自分の計算こそ正しい」と信じる面々の前で守り切ること。加えて、分析チームの順番待ちで1週間費やさずとも、普通の言葉で質問できる仕組みです。
 
-You pick the domain, the metric, and how deep into data science you go. The only rule: the disagreement has to be *plausible*. Pick a metric where reasonable people could genuinely calculate it differently.
+ドメイン、指標、データサイエンスへの踏み込み具合は自由です。ルールは1つだけ。意見の対立に*もっともらしさ*があること。良識ある人たちが本気で計算方法を違えかねない指標を選んでください。
 
 ---
 
-## Pick Your Domain (or invent your own)
+## ドメインを選ぶ(自作も歓迎)
 
-| Domain | The contested metric | Why nobody agrees |
+| ドメイン | 争点となる指標 | 意見が割れる理由 |
 |---|---|---|
-| **Manufacturing** | OEE (Overall Equipment Effectiveness) | Does planned maintenance count as downtime? Startup scrap? |
-| **SaaS / subscription** | Churn | Logo versus revenue churn. Does a downgrade count? When does the clock start? |
-| **E-commerce / retail** | Customer Lifetime Value | Which margin? Which discount rate? Cohort versus predictive? |
-| **Logistics / delivery** | On-Time Delivery | Promised date versus revised date. Partial shipments. Whose clock? |
-| **Fintech / lending** | Default rate | 30/60/90 days past due? Principal only? After recoveries? |
-| **Healthcare ops** | Bed utilization | Midnight census versus hourly. Does observation count? |
-| **Ad tech / media** | Attribution | Last-touch versus multi-touch. Which lookback window? |
+| **製造** | OEE(設備総合効率) | 計画保全はダウンタイムに数えるのか。立ち上げ時のスクラップは。 |
+| **SaaS / サブスクリプション** | チャーン | ロゴチャーンかレベニューチャーンか。ダウングレードは含むのか。起算日はいつか。 |
+| **e コマース / 小売** | 顧客生涯価値(CLV) | どのマージンを使うのか。割引率は。コホート方式か予測方式か。 |
+| **物流 / 配送** | 納期遵守率 | 当初の約束日か、変更後の日付か。分納の扱いは。誰の時計で測るのか。 |
+| **フィンテック / 融資** | デフォルト率 | 延滞30日か、60日か、90日か。元本のみか。回収後の数字か。 |
+| **医療オペレーション** | 病床稼働率 | 深夜0時時点の在床数か、毎時か。観察入院は数えるのか。 |
+| **アドテック / メディア** | アトリビューション | ラストタッチかマルチタッチか。ルックバックウィンドウはどれか。 |
 
 ---
 
-## Challenges
+## チャレンジ
 
-Waypoints, not a checklist. Pick the ones you want to pursue.
+チェックリストではなく、道しるべです。追いかけたいものを選んでください。
 
-1. **The Room.** *(PM/BA)* Requirements from four stakeholders who each think they're right: the VP, the analyst who built the old dashboards, the ops manager who'll be measured on this, and the finance director whose forecast depends on it. Role-play the interviews with Claude. Capture the disagreements explicitly rather than smoothing them over; they will shape the metric definition.
+1. **会議室。** *(PM/BA)* 「自分こそ正しい」と思っている4人のステークホルダーから要件を集めます。VP、旧ダッシュボードを作ったアナリスト、この数字で評価されることになる運用マネージャー、この数字に予測を依存している財務ディレクター。Claude を相手にインタビューをロールプレイしてください。対立は丸く収めず、明示的に記録します。それが指標の定義を形作ります。
 
-2. **The Mess.** *(Dev)* Plausible raw data for your domain. Realistic noise: gaps, mislabeled categories, a source in the wrong timezone, duplicates after a retry storm. The ugliness is the point.
+2. **カオス。** *(開発)* 選んだドメインの、もっともらしい生データを作ります。現実的なノイズ込みで。欠損、ラベルを間違えたカテゴリ、タイムゾーンのずれたソース、リトライストームの後に残った重複。その醜さこそが狙いです。
 
-3. **The Definition.** *(Architect)* Define the metric once. Every assumption, every edge case, every "what counts," with boundary examples. Replace vague modifiers with concrete thresholds: "recent" should become "within the last 14 calendar days," "significant" should be a numeric cut. Explicit criteria with boundary examples outperform vague instructions. The definition is the first-class citizen of your semantic layer, and every downstream result should carry the definition version that produced it.
+3. **定義。** *(アーキテクト)* 指標をただ一度だけ定義します。すべての前提、すべてのエッジケース、すべての「何を数えるか」を、境界例付きで。曖昧な修飾語は具体的な閾値に置き換えます。「最近」は「過去14暦日以内」に、「大幅」は数値の線引きに。境界例を伴う明示的な基準は、曖昧な指示に勝ります。この定義こそがセマンティックレイヤーの主役であり、下流のすべての結果に、それを生んだ定義のバージョンを持たせるべきです。
 
-4. **The Engine.** *(Dev)* Build the calculation as code with an API, not a SQL view buried in a BI tool. Testable, versioned, explainable. Each result is tagged with the definition version.
+4. **エンジン。** *(開発)* 計算ロジックを、BI ツールの奥に埋もれた SQL ビューではなく、API を備えたコードとして実装します。テスト可能で、バージョン管理され、説明可能であること。各結果には定義バージョンのタグを付けます。
 
-5. **The One.** *(Dev/PM)* One dashboard that replaces the 40. Wireframe first, working prototype second. Drill-down from the top-level number to the row an operator actually fixes.
+5. **一枚。** *(開発/PM)* 40枚を置き換える1枚のダッシュボード。まずワイヤーフレーム、次に動くプロトタイプ。トップレベルの数字から、現場の担当者が実際に手を打つ行まで、ドリルダウンできるようにします。
 
-6. **The Reconciliation.** *(Quality)* Your number versus the four existing calculations. A table where rows are edge cases, columns are the five definitions, and cells are what each returns. This is the artifact that wins the room, so prioritize it over dashboard polish.
+6. **突き合わせ。** *(品質)* あなたの数字と、既存の4通りの計算の比較です。行がエッジケース、列が5つの定義、セルが各定義の返す値、という表を作ります。会議室を制するのはこの成果物なので、ダッシュボードの磨き込みよりも優先してください。
 
-7. **The Scorecard.** *(Quality)* An eval harness for the NL query system and the metric engine together. A golden set of questions with expected answers, including several that should refuse because the data honestly can't answer them. Metrics: accuracy, refusal accuracy (did it refuse the right ones), and false-confidence rate (confident-and-wrong is the one that gets people fired). Stratified sampling across question types. Runs in CI so the quality numbers move with every semantic-layer change, and the VP has a number to defend when she stops trusting dashboards.
+7. **スコアカード。** *(品質)* 自然言語クエリシステムと指標エンジンをまとめて測る eval ハーネス。期待される回答付きの質問のゴールデンセットを作り、その中に、データでは正直に答えられないため回答を拒否すべき質問もいくつか含めます。メトリクスは、正答率、拒否の正確さ(拒否すべきものを正しく拒否できたか)、誤確信率(自信満々の誤答こそ人のクビが飛ぶやつです)。質問タイプをまたぐ層化サンプリングを使います。CI で回しておけば、セマンティックレイヤーを変更するたびに品質の数字が動き、ダッシュボード不信に陥った VP にも守れる数字を渡せます。
 
-8. **The Question.** *(Stretch)* Natural-language query over your semantic layer. "Why was Tuesday worse than Monday?" should get a real answer, not a chart dump. Teach it with a handful of few-shot examples, including at least one question it should refuse because the data honestly can't answer it. An MCP server over the semantic layer (`get_metric`, `list_definitions`, `explain_calculation`, `compare_periods`) keeps the NL layer thin. If you surface row-level drill-downs, a `PostToolUse` hook that redacts PII deterministically beats trusting the prompt to do it.
+8. **質問。** *(発展)* セマンティックレイヤーの上に自然言語クエリを載せます。「なぜ火曜は月曜より悪かったのか」に、チャートの山ではなく本物の答えが返ること。少数の few-shot 例で教えます。データでは正直に答えられないため拒否すべき質問を、最低1つ含めてください。セマンティックレイヤーの上に MCP サーバー(`get_metric`、`list_definitions`、`explain_calculation`、`compare_periods`)を立てれば、自然言語レイヤーは薄く保てます。行レベルのドリルダウンを見せるなら、PII を決定論的にレダクションする `PostToolUse` フックのほうが、プロンプト任せよりも確実です。
 
-9. **The Panel.** *(Stretch, agentic)* "Explain the variance" with Task subagents. When the metric moves unexpectedly, spin up a panel of parallel subagents: one segments by geography, one by product, one by time. Each returns a structured finding with its evidence. A coordinator picks the best explanation and shows the losing theories rather than hiding them. Context passed explicitly in each Task prompt, since subagents don't inherit coordinator context. This hooks into The Question: an anomaly can pre-populate an NL query with "what changed, and why do we think so."
-
----
-
-## Optional: Start From Data, Not From Zero
-
-- **AdventureWorks for Postgres** ([github.com/lorint/AdventureWorks-for-Postgres](https://github.com/lorint/AdventureWorks-for-Postgres)). Good fit for revenue, on-time, or CLV metrics.
-- **Sentinel KYC** ([github.com/beck-source/sentinel-kyc](https://github.com/beck-source/sentinel-kyc)). Fintech and compliance angle. Requires an API key.
-
-If you use one, skip the generation part of Challenge 2, but not the inspection part. Challenge 3 still needs you to pick a contested metric.
+9. **パネル。** *(発展、エージェント)* Task サブエージェントによる「変動の説明」。指標が予想外に動いたら、並列サブエージェントのパネルを起動します。1体は地域別、1体は製品別、1体は時間軸でセグメント分析。それぞれが証拠付きの構造化された所見を返します。コーディネーターは最も説得力のある説明を選びつつ、敗れた仮説も隠さずに見せます。サブエージェントはコーディネーターのコンテキストを引き継がないため、コンテキストは各 Task プロンプトで明示的に渡します。これは「質問」ともつながります。異常の検知をきっかけに、「何が変わったのか、なぜそう考えるのか」という自然言語クエリを自動で立ち上げられるのです。
 
 ---
 
-**Cert domains this scenario stresses:**
+## オプション: ゼロからではなく、データから始める
 
-- **Prompt Engineering.** Explicit criteria with boundary examples in the metric definition (no "material" or "significant" without thresholds); few-shot for the NL query including at least one refusal case.
-- **Tool Design.** MCP server over the semantic layer so the NL layer stays thin and a fresh Claude session reaches for the right tool first.
-- **Context Management.** Context preservation across NL questions; `PostToolUse` redaction of PII in drill-down rows; refusal accuracy, stratified sampling, and false-confidence rate on the NL eval (via The Scorecard).
-- **Agentic Architecture.** Task subagents for parallel variance explanation, with explicit context passed in each Task call (optional, via The Panel).
+- **AdventureWorks for Postgres**([github.com/lorint/AdventureWorks-for-Postgres](https://github.com/lorint/AdventureWorks-for-Postgres))。収益、納期遵守、CLV あたりの指標と相性が良いでしょう。
+- **Sentinel KYC**([github.com/beck-source/sentinel-kyc](https://github.com/beck-source/sentinel-kyc))。フィンテックとコンプライアンスの観点を備えています。API キーが必要です。
+
+これらを使う場合、チャレンジ2の生成パートはスキップして構いませんが、検分パートはスキップしないでください。また、チャレンジ3で争点のある指標を選ぶ作業は残ります。
+
+---
+
+**このシナリオで鍛えられる認定試験ドメイン:**
+
+- **プロンプトエンジニアリング。** 指標定義における境界例付きの明示的な基準(閾値のない「重要」「大幅」を許さない)。拒否ケースを最低1つ含む、自然言語クエリのための few-shot。
+- **ツール設計。** 自然言語レイヤーを薄く保ち、まっさらな Claude セッションが最初から正しいツールに手を伸ばせるようにする、セマンティックレイヤー上の MCP サーバー。
+- **コンテキスト管理。** 自然言語の質問をまたいだコンテキストの維持。ドリルダウン行の PII を `PostToolUse` でレダクション。自然言語 eval における拒否の正確さ、層化サンプリング、誤確信率(「スコアカード」経由)。
+- **エージェントアーキテクチャ。** 変動を並列で説明する Task サブエージェント。各 Task 呼び出しでの明示的なコンテキスト受け渡し(任意、「パネル」経由)。

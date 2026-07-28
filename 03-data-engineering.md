@@ -1,49 +1,49 @@
-# Scenario 3. Data Engineering
+# シナリオ3. データエンジニアリング
 
-## "The Swamp"
+## 「沼」
 
-Fabrikam Retail has seven source systems: POS, e-commerce, loyalty, CRM, and three more picked up through mergers. None of them agree on what a "customer" is. Same person, four IDs, two spellings. The analytics team gave up and builds everything from CSV exports. The new CDO wants a single source of truth.
+Fabrikam Retail には7つのソースシステムがあります。POS、e コマース、ロイヤルティ、CRM、それに買収で抱え込んだ3つ。どのシステムも「顧客」が何を指すのかで一致していません。同じ人物に4つの ID、氏名の表記は2通り。分析チームはあきらめて、すべてを CSV エクスポートから組み立てています。新任の CDO は単一の信頼できる情報源を求めています。
 
-You pick the architecture and the stack: lakehouse, warehouse, mesh, your choice.
-
----
-
-## Challenges
-
-Waypoints, not a checklist. Pick the ones you want to pursue.
-
-1. **The Mess.** *(Dev)* Realistic sample data across a handful of the sources. Different schemas, conflicting keys, encoding problems, a timezone bug, duplicates that aren't obvious. Prompt Claude explicitly to produce the kind of bad data real systems emit, not synthetic-looking noise. A few few-shot examples contrasting "good bad data" with "bad bad data" will teach it the difference. The realism is what makes matching and data quality worth doing later.
-
-2. **The Blueprint.** *(Architect)* Target architecture. Layers, zones, retention, PII rules, who reads what. Commit as an ADR with a "what we deliberately chose not to do" section. A three-level `CLAUDE.md` pays off: repo root for the overall pattern, per-zone for the rules that differ between raw, conformed, and curated (mutation, retention, PII), user-level for personal preferences.
-
-3. **The Intake.** *(Dev)* Ingestion for a few sources with different shapes (batch file, CDC stream, flaky API). All land in the raw layer with lineage metadata. Wrap the parse-and-land step in a validation-retry loop: Claude parses semi-structured input into your schema, a structured validator checks it, on failure the specific error is fed back and Claude retries up to N times. Log retry count and error type per row; those numbers become evidence later.
-
-4. **The Customer.** *(Dev/Architect)* Master the customer entity across sources. Explicit survivorship rules. A golden record with a confidence score. Teach the matcher with a few sharp boundary examples, including at least one negative case ("these two records look alike but are not the same person, and here's why"). Two crisp boundary examples reliably outperform a page of "be conservative."
-
-5. **The Tripwire.** *(Quality)* Data quality checks: schema drift, null explosions, volume anomalies, referential integrity. For each check, decide whether it breaks the pipeline or just alerts, and document the rule. These are deterministic guardrails, so enforce them in code rather than prompts. A `PreToolUse` hook that blocks writes into the curated zone until the schema contract passes is a natural fit.
-
-6. **The Catalog.** *(PM/BA)* Catalog entries for the core entities, written for an analyst rather than an engineer. What is this, where did it come from, can I trust it, what does "customer" mean *here*. Link each entry to its upstream contract so analysts can see what the producer is actually promising.
-
-7. **The Scorecard.** *(Quality)* An eval harness for the entity matcher. A golden dataset of labeled match, non-match, and unclear pairs, including the boundary cases your few-shot prompt is trying to teach. Metrics: precision, recall, and false-confidence rate (how often the matcher says "high confidence" and is wrong). Stratified sampling so the score doesn't get dominated by easy cases. Runs in CI so the CDO has a defensible single number when she asks "how good is this."
-
-8. **The Trace.** *(Stretch)* Lineage end-to-end. Given one bad value in a report, walk it back to the source row programmatically, including any transformations along the way. An MCP server over the data platform (`preview_table`, `trace_lineage`, `find_record`, `get_source_schema`) is a natural fit. Tool descriptions that include input formats, edge cases, and what each tool does *not* do help a fresh Claude session pick the right tool on the first try.
-
-9. **The Swarm.** *(Stretch, agentic)* Parallel profiling with Task subagents. One subagent per source from The Mess, each scoring data quality (completeness, freshness, key coverage, anomaly count, PII surface) and emitting a structured report. A coordinator aggregates into a single "swamp health" dashboard. Context passed explicitly in each Task prompt, since subagents don't inherit coordinator context. Showing exactly what each subagent received in its prompt is part of the artifact; it makes the decomposition legible to a reviewer.
+アーキテクチャとスタックは自由です。レイクハウスでも、ウェアハウスでも、データメッシュでも、お好きなものを。
 
 ---
 
-## Optional: Start From Data, Not From Zero
+## チャレンジ
 
-- **AdventureWorks for Postgres** ([github.com/lorint/AdventureWorks-for-Postgres](https://github.com/lorint/AdventureWorks-for-Postgres)). Classic retail schema. Good fit for customer-entity work.
-- **Sentinel KYC** ([github.com/beck-source/sentinel-kyc](https://github.com/beck-source/sentinel-kyc)). KYC data with a compliance angle. Requires an API key.
+チェックリストではなく、道しるべです。追いかけたいものを選んでください。
 
-If you use one, skip the generation half of Challenge 1 but not the inspection half. Go find the noise that's already in there and document it.
+1. **カオス。** *(開発)* いくつかのソースにまたがるリアルなサンプルデータを作ります。バラバラのスキーマ、衝突するキー、エンコーディングの問題、タイムゾーンのバグ、一見しただけでは分からない重複。いかにも合成データというノイズではなく、実システムが吐き出す類の悪いデータを作るよう、Claude に明示的に指示してください。「上手にできた悪いデータ」と「出来の悪い悪いデータ」を対比する few-shot の例をいくつか見せれば、その違いを教え込めます。このリアルさこそが、後のマッチングやデータ品質の作業を価値あるものにします。
+
+2. **設計図。** *(アーキテクト)* ターゲットアーキテクチャです。レイヤー、ゾーン、保持期間、PII のルール、誰が何を読めるか。「あえてやらないと決めたこと」のセクションを付けて ADR としてコミットします。3階層の `CLAUDE.md` が効いてきます。リポジトリのルートには全体のパターンを、ゾーンごとには raw、conformed、curated で異なるルール(変更可否、保持期間、PII)を、ユーザーレベルには個人の好みを。
+
+3. **取り込み。** *(開発)* 形の異なる数ソース(バッチファイル、CDC ストリーム、不安定な API)のインジェストを作ります。すべてリネージメタデータ付きで raw レイヤーに着地させます。パースして着地させるステップは、検証リトライループで包んでください。Claude が半構造化された入力をスキーマに沿ってパースし、構造化バリデーターがチェックし、失敗したら具体的なエラーをフィードバックして Claude が最大 N 回リトライする。行ごとのリトライ回数とエラー種別をログに残しておけば、その数字が後々の証拠になります。
+
+4. **顧客。** *(開発/アーキテクト)* ソースを横断して顧客エンティティをマスタリングします。明示的なサバイバーシップルール。確信度スコア付きのゴールデンレコード。マッチャーには少数の鋭い境界例を与えて教えます。少なくとも1つはネガティブケースを含めてください(「この2レコードはよく似ているが同一人物ではない。理由はこうだ」)。切れ味のよい境界例2つのほうが、「保守的に判定せよ」と1ページ書き連ねるより確実に効きます。
+
+5. **トリップワイヤー。** *(品質)* データ品質チェックです。スキーマドリフト、null の急増、ボリューム異常、参照整合性。チェックごとに、パイプラインを止めるのかアラートに留めるのかを決め、そのルールを文書化します。これらは決定論的なガードレールなので、プロンプトではなくコードで強制してください。スキーマコントラクトを通過するまで curated ゾーンへの書き込みをブロックする `PreToolUse` フックは、自然な選択です。
+
+6. **カタログ。** *(PM/BA)* コアエンティティのカタログエントリを、エンジニアではなくアナリストに向けて書きます。これは何なのか、どこから来たのか、信頼してよいのか、*ここでの*「顧客」は何を意味するのか。各エントリを上流のコントラクトにリンクし、プロデューサーが実際に何を約束しているのかをアナリストが確認できるようにします。
+
+7. **スコアカード。** *(品質)* エンティティマッチャーの eval ハーネス。マッチ、非マッチ、判定不能のラベルを付けたペアからなるゴールデンデータセットを作り、few-shot プロンプトで教えようとしている境界ケースもそこに含めます。メトリクスは precision、recall、そして誤確信率(マッチャーが「高確信」と言いながら外している頻度)。簡単なケースにスコアが支配されないよう、層化サンプリングを使います。CI で回しておけば、CDO に「これはどのくらい当てになるの」と聞かれたとき、根拠のある1つの数字で答えられます。
+
+8. **トレース。** *(発展)* エンドツーエンドのリネージです。レポート上の1つの不正な値を起点に、途中の変換も含めて、プログラムからソースの行まで遡れること。データプラットフォームの上に立てる MCP サーバー(`preview_table`、`trace_lineage`、`find_record`、`get_source_schema`)が自然にはまります。入力フォーマット、エッジケース、各ツールが*何をしないか*まで書いた説明文があれば、まっさらな Claude セッションでも一発で正しいツールを選べます。
+
+9. **スウォーム。** *(発展、エージェント)* Task サブエージェントによる並列プロファイリング。「カオス」で作ったソースごとにサブエージェントを1つ立て、それぞれがデータ品質(完全性、鮮度、キーのカバレッジ、異常件数、PII の露出範囲)を採点して構造化レポートを出力します。コーディネーターがそれらを1枚の「沼の健康状態」ダッシュボードに集約します。サブエージェントはコーディネーターのコンテキストを引き継がないため、コンテキストは各 Task プロンプトで明示的に渡します。各サブエージェントがプロンプトで何を受け取ったのかをそのまま見せることも成果物の一部です。分割の設計がレビュアーに読める形になります。
 
 ---
 
-**Cert domains this scenario stresses:**
+## オプション: ゼロからではなく、データから始める
 
-- **Prompt Engineering.** Few-shot boundary examples for entity matching, including at least one negative case; validation-retry loops on ingestion.
-- **Tool Design.** MCP server over the data platform with lineage and preview tools; descriptions that help a fresh Claude session pick the right tool on the first try.
-- **Context Management.** Field-level confidence on the golden record; hook-enforced curated-zone guardrails paired with prompt-level zone preferences; stratified sampling and false-confidence rate on the matcher eval (via The Scorecard).
-- **Agentic Architecture.** Task subagents for parallel source profiling, with explicit context passed in each Task call (optional, via The Swarm).
+- **AdventureWorks for Postgres**([github.com/lorint/AdventureWorks-for-Postgres](https://github.com/lorint/AdventureWorks-for-Postgres))。定番のリテールスキーマです。顧客エンティティの作業と相性が良いでしょう。
+- **Sentinel KYC**([github.com/beck-source/sentinel-kyc](https://github.com/beck-source/sentinel-kyc))。コンプライアンスの観点を備えた KYC データ。API キーが必要です。
+
+これらを使う場合、チャレンジ1の生成パートはスキップして構いませんが、検分パートはスキップしないでください。すでに中に潜んでいるノイズを探し出し、文書化しましょう。
+
+---
+
+**このシナリオで鍛えられる認定試験ドメイン:**
+
+- **プロンプトエンジニアリング。** エンティティマッチングのための few-shot 境界例(ネガティブケースを最低1つ含む)。インジェストでの検証リトライループ。
+- **ツール設計。** リネージとプレビューのツールを備えた、データプラットフォーム上の MCP サーバー。まっさらな Claude セッションが一発で正しいツールを選べる説明文。
+- **コンテキスト管理。** ゴールデンレコードにおけるフィールド単位の確信度。フックで強制する curated ゾーンのガードレールと、プロンプトレベルのゾーン優先指示の併用。マッチャー eval における層化サンプリングと誤確信率(「スコアカード」経由)。
+- **エージェントアーキテクチャ。** ソースを並列でプロファイリングする Task サブエージェント。各 Task 呼び出しでの明示的なコンテキスト受け渡し(任意、「スウォーム」経由)。

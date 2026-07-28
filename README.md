@@ -1,173 +1,173 @@
-# Claude Code Hackathon
+# Claude Code ハッカソン
 
-## The Point
+## 趣旨
 
-This is a hack. You get a team, a scenario, and Claude Code. The scenarios are enterprise-flavored briefs: a monolith nobody understands, a migration nobody agrees on, seven systems that can't agree on what a customer is. Real problems, compressed.
+これはハッカソンです。チームとシナリオ、そして Claude Code。手元にあるのはそれだけです。シナリオはいずれもエンタープライズの現場を思わせる課題設定になっています。誰にも中身が分からないモノリス、誰も方針に合意できない移行プロジェクト、「顧客」の定義が一致しない7つのシステム。現実の問題をぎゅっと凝縮しました。
 
-There's no prescribed path. Each scenario sketches a handful of challenges worth working toward. How you get there, what stack you pick, what you skip, what you invent on top is up to you. We care about ambition and judgment, not box-checking.
-
----
-
-## The Setup
-
-Pick one scenario. Work with your team. Get as far as you can.
-
-Each scenario sketches a handful of challenges. You probably won't do them all, and that's the point. **Depth beats breadth.** Pick the ones that interest you, work in parallel where you can, and let Claude help you coordinate.
+決まった進め方はありません。各シナリオには、取り組む価値のあるチャレンジをいくつか示してあります。どう進めるか、どのスタックを選ぶか、何を省略し、何を独自に上乗せするかはすべて皆さん次第です。私たちが見たいのは意欲と判断力であって、チェックボックスの消化ではありません。
 
 ---
 
-## How Your Team Works
+## 進め方
 
-The scenarios span the SDLC, so there's meaningful work for PM, architect, dev, test, and platform. You won't have one of each, and that's fine. **Play every role, regardless of your day job.** Claude Code doesn't care what your title is, and a lot of what makes the hack interesting is watching the tool perform in parts of the work you don't normally touch.
+シナリオを1つ選び、チームで取り組み、行けるところまで進んでください。
 
-Divide the challenges up early. Share a running `CLAUDE.md` so everyone teaches the tool the same conventions. Commit often. The commit history is part of the submission and part of how the judges read the journey.
-
----
-
-## The Rules
-
-1. **Tech stack is yours to choose.** One exception: Scenario 5 requires the **Claude Agent SDK**. Use Claude to help you learn it, or to migrate if you're coming from another framework.
-2. **You may need to build starter code, data, or documents.** If the scenario says "a 12-year-old monolith exists," you generate it. That's part of the job. Some scenarios offer optional starter repos. Use them or don't.
-3. **Play every role.** Your team needs a PM, architect, developer, tester, data engineer, and infra engineer whether you staffed for it or not.
-4. **Commit history is evidence.** We want to see the journey, not just the destination.
-5. **`CLAUDE.md` is your friend.** Teach it your conventions early.
-6. **Document your work.** Your repo must include a `README.md` (template below) explaining what you built and what you'd do next.
-7. **Build a presentation.** Use Claude Code to generate an HTML presentation you *could* deliver if you win the judging. It lives in your repo whether you present or not.
-8. **Claude will judge.** At the end, Claude evaluates submissions. A handful of teams present live.
+各シナリオにはチャレンジをいくつか用意しています。全部はこなせないはずですし、それで構いません。**広く浅くより、狭く深く。** 興味のあるものを選び、並行できるところは並行して進め、連携の交通整理は Claude にも手伝ってもらいましょう。
 
 ---
 
-## The Scenarios
+## チームでの動き方
 
-| \# | Scenario | One-liner |
+シナリオは SDLC 全体にまたがるので、PM、アーキテクト、開発、テスト、プラットフォームのそれぞれに意味のある仕事があります。各役割の担当者が揃っていなくても問題ありません。**普段の職種に関係なく、すべての役割を演じてください。** Claude Code は肩書きを気にしませんし、普段は触れない領域でこのツールがどう働くかを見られることこそ、このハッカソンの醍醐味のひとつです。
+
+チャレンジは早めに分担しましょう。`CLAUDE.md` をチームで共有して育てれば、全員が同じ規約をツールに教えられます。コミットはこまめに。コミット履歴は提出物の一部であり、審査員が皆さんの道のりを読み取る手がかりでもあります。
+
+---
+
+## ルール
+
+1. **技術スタックは自由です。** 例外は1つだけ。シナリオ5では **Claude Agent SDK** の使用が必須です。習得には Claude の力を借りてください。別のフレームワークからの移行でも同様です。
+2. **スターターコード、データ、ドキュメントは自作が必要になる場合があります。** シナリオに「築12年のモノリスが存在する」とあれば、それを生成するのも仕事のうちです。一部のシナリオには任意で使えるスターターリポジトリがあります。使うかどうかはお任せします。
+3. **すべての役割を演じてください。** PM、アーキテクト、開発者、テスター、データエンジニア、インフラエンジニア。人員を揃えたかどうかにかかわらず、チームにはこの全員が必要です。
+4. **コミット履歴は証拠です。** 見たいのは到達点だけでなく、そこに至る道のりです。
+5. **`CLAUDE.md` は頼れる相棒です。** 早い段階でチームの規約を教え込みましょう。
+6. **作業をドキュメント化してください。** リポジトリには、何を作り、次に何をするつもりかを説明する `README.md`(テンプレートは後述)を必ず含めます。
+7. **プレゼンテーションを作ってください。** 審査を勝ち抜いたら実際に発表*できる*水準の HTML プレゼンテーションを、Claude Code で生成します。発表の有無にかかわらずリポジトリに含めてください。なお、日本語フォントには Noto Sans JP を使用してください(Anthropic Sans は日本語グリフに対応していないため)。
+8. **審査は Claude が行います。** 最後に Claude が提出物を評価し、上位の数チームがライブで発表します。
+
+---
+
+## シナリオ一覧
+
+| \# | シナリオ | ひとこと紹介 |
 | :---- | :---- | :---- |
-| 1 | **[Code Modernization](01-code-modernization.md)** | A monolith nobody understands. The board wants it "modernized." |
-| 2 | **[Cloud Migration](02-cloud-migration.md)** | On-prem to cloud. The CFO and CTO disagree on how. |
-| 3 | **[Data Engineering](03-data-engineering.md)** | Seven systems. Zero agreement on what a "customer" is. |
-| 4 | **[Data Analytics](04-data-analytics.md)** | 40 dashboards. One metric. Four different answers. |
-| 5 | **[Agentic Solution](05-agentic-solution.md)** (Claude Agent SDK) | 200 requests a day, triaged by hand. Build the agent. |
+| 1 | **[コードモダナイゼーション](01-code-modernization.md)** | 誰にも中身が分からないモノリス。経営陣は「モダナイズせよ」と言う。 |
+| 2 | **[クラウド移行](02-cloud-migration.md)** | オンプレからクラウドへ。CFO と CTO で方針が食い違う。 |
+| 3 | **[データエンジニアリング](03-data-engineering.md)** | 7つのシステム。「顧客」の定義はてんでバラバラ。 |
+| 4 | **[データアナリティクス](04-data-analytics.md)** | ダッシュボード40枚。指標は1つ、答えは4通り。 |
+| 5 | **[エージェントソリューション](05-agentic-solution.md)**(Claude Agent SDK) | 1日200件の依頼を手作業でトリアージ。エージェントの出番です。 |
 
 ---
 
-## Techniques to Reach For
+## 活用したいテクニック
 
-These are the patterns the Claude Code Architecture certification tests on. No scenario requires them, and no challenge dictates which to use. They're here because a lot of teams also want the hack to double as cert practice. Pick two or three you want to get reps on, and reach for them inside whichever challenges you pursue.
+ここに挙げるのは、Claude Code Architecture 認定試験で問われるパターンです。どのシナリオでも必須ではなく、どのチャレンジでどれを使うかも指定しません。それでも載せているのは、ハッカソンを認定試験の練習も兼ねたいというチームが多いからです。腕を磨きたいものを2つか3つ選び、取り組むチャレンジの中で実践してみてください。
 
-**Agentic Architecture**
+**エージェントアーキテクチャ**
 
-- Coordinator plus specialist subagents via the Task tool, with context passed *explicitly* in each call (Task subagents don't inherit coordinator context).
-- Stop conditions that are real signals, not "parse the text" or "iteration cap."
-- `fork_session` to try two paths on the same input and compare.
+- Task tool によるコーディネーター+専門サブエージェント構成。コンテキストは各呼び出しで*明示的に*渡す(Task サブエージェントはコーディネーターのコンテキストを引き継ぎません)。
+- 停止条件は本物のシグナルにする。「テキストをパースする」や「イテレーション上限」で済ませない。
+- `fork_session` で同じ入力に対して2つのアプローチを試し、比較する。
 
-**Tool Design & MCP**
+**ツール設計と MCP**
 
-- Tool descriptions that say what the tool *does* and what it *does not*. Input formats, edge cases, example queries.
-- Structured error responses (`isError: true` with a reason code and guidance) so the agent can recover gracefully.
-- Keep each specialist's tool count small. Reliability tends to drop once an agent has more than a handful.
-- An MCP server over whatever system you built, so a fresh Claude session picks the right tool on the first try.
+- ツールの説明文には、そのツールが*何をするか*と*何をしないか*の両方を書く。入力フォーマット、エッジケース、クエリ例も添える。
+- 構造化されたエラーレスポンス(`isError: true` に理由コードとガイダンスを添える)で、エージェントが適切にリカバリーできるようにする。
+- 各専門エージェントのツール数は絞る。ツールが数個を超えると信頼性は落ちがちです。
+- 構築したシステムの上に MCP サーバーを立て、まっさらな Claude セッションでも一発で正しいツールを選べるようにする。
 
-**Claude Code Config**
+**Claude Code の設定**
 
-- Three-level `CLAUDE.md`: user (personal preferences), project (shared, in VCS), directory (per-module specifics).
-- Custom slash commands *and* skills, used distinctly. A command runs a playbook; a skill captures reusable guidance.
-- Plan Mode for anything reversible-dangerous; direct execution for the safe paths. Defend the default.
-- Non-interactive Claude Code in CI, with scoped tools and no write access to production paths.
+- 3階層の `CLAUDE.md`。ユーザーレベル(個人の好み)、プロジェクトレベル(VCS で共有)、ディレクトリレベル(モジュールごとの詳細)。
+- カスタムスラッシュコマンド*と*スキルを、役割を分けて使う。コマンドは手順書の実行、スキルは再利用可能なガイダンスの蓄積です。
+- 取り返しのつかない危険な操作には Plan Mode、安全な経路は直接実行。そのデフォルト設定の根拠を説明できるようにしておく。
+- CI では非対話モードの Claude Code を使う。ツールのスコープを絞り、本番パスへの書き込み権限は与えない。
 
-**Prompt Engineering**
+**プロンプトエンジニアリング**
 
-- Explicit criteria in place of vague modifiers. "Material," "significant," and "recent" are usually a signal that the definition needs sharper thresholds.
-- Few-shot examples with a negative case and a boundary case. Two sharp examples outperform eight fuzzy ones.
-- `tool_use` with a JSON Schema for anything that must parse. Don't prompt-for-JSON.
-- Validation-retry loop: structured validator checks the output, errors are fed back, Claude retries up to N times. Log retry count and error type.
+- 曖昧な修飾語の代わりに明示的な基準を。「重要な」「大幅な」「最近の」といった言葉が出てきたら、定義にもっと鋭い閾値が必要だというサインです。
+- few-shot の例にはネガティブケースと境界ケースを含める。切れ味のよい例2つは、ぼんやりした例8つに勝ります。
+- パースが必要な出力には、JSON Schema 付きの `tool_use` を使う。プロンプトで JSON をお願いしない。
+- 検証リトライループ。構造化バリデーターが出力をチェックし、エラーをフィードバックして、Claude が最大 N 回リトライする。リトライ回数とエラー種別はログに残す。
 
-**Context Management**
+**コンテキスト管理**
 
-- Hooks for deterministic guardrails (`PreToolUse` to block, `PostToolUse` to redact). Prompts for probabilistic preferences. An ADR on why each is which is worth writing; the distinction shows up repeatedly on the exam.
-- Escalation rules that are category plus confidence plus impact, not "when the agent isn't sure."
-- Stratified sampling and field-level confidence when humans review.
-
----
-
-## The Judging
-
-Claude does the first pass. Top teams present live.
-
-**What definitely gets read:**
-
-1. Your `README.md`
-2. Your `presentation.html`
-3. Your `CLAUDE.md`
-
-These are your pitch. Don't leave them to the end. If Claude only sees those three files, it should still understand what you built, why it matters, how far you got, and how you taught the tool to work your way. We may go deeper into the repo, we may not. Assume those three carry the weight.
-
-**What we're looking for** (final categories will be a surprise!, but think along these lines):
-
-- **Most production-ready.** Could hand it to an ops team Monday.
-- **Best architecture thinking.** ADRs, diagrams, decisions someone will thank you for later.
-- **Best testing.** Not coverage. Adversarial thinking, edge cases, evals.
-- **Best product work.** Stories that are actually stories. Docs that persuade.
-- **Most inventive Claude Code use.** Subagents, hooks, skills, something we didn't expect.
-- **Wildcards:** best CI/CD, best legacy archaeology, best "what if this goes wrong" thinking, furthest through the challenges with quality intact, team that questioned a scenario requirement and was *right*.
+- 決定論的なガードレールにはフック(ブロックには `PreToolUse`、レダクションには `PostToolUse`)、確率的な好みにはプロンプト。どちらをどちらにしたのか、その理由を ADR に書いておく価値があります。この使い分けは試験でも繰り返し問われます。
+- エスカレーションルールは「エージェントが自信を持てないとき」ではなく、カテゴリ+確信度+影響度で定義する。
+- 人間がレビューする際は、層化サンプリングとフィールド単位の確信度を使う。
 
 ---
 
-## Submission
+## 審査
 
-You need three files:
+一次審査は Claude が行い、上位チームがライブで発表します。
 
-1. **`README.md`** tells the story. Use the template below.
-2. **`CLAUDE.md`** so we can see how you taught Claude Code to work your way.
-3. **`presentation.html`**, your HTML deck built with Claude Code, ready to present if called.
+**確実に読まれるもの:**
 
-**Preferred:** put the three files in a folder named for your table and team (for example `Table1_SonnetSlayers/`) and upload the folder to the link provided at your session.
+1. `README.md`
+2. `presentation.html`
+3. `CLAUDE.md`
 
-**Alternative:** if a folder upload isn't supported, zip the three files into an archive with the same naming convention (for example `Table1_SonnetSlayers.zip`) and upload that instead.
+この3つが皆さんのピッチです。最後に回さないでください。仮に Claude がこの3ファイルしか見なかったとしても、何を作り、なぜそれが重要で、どこまで到達し、自分たちのやり方をツールにどう教えたのかが伝わるようにしてください。リポジトリの奥まで読み込むかもしれませんし、読まないかもしれません。この3つがすべてを背負っている、そう考えてください。
 
-Either way, **one submission per team**.
+**評価の観点**(最終的なカテゴリは当日のお楽しみですが、方向性としては次のとおりです):
 
-**NO CLIENT OR INTERNAL DATA.** Anything in the submission must be safe to share.
+- **最も本番投入に近い。** 月曜日にそのまま運用チームへ引き渡せる。
+- **最も優れたアーキテクチャ思考。** ADR、図、後から誰かに感謝される意思決定。
+- **最も優れたテスト。** カバレッジの数字ではなく、攻撃者の視点、エッジケース、eval。
+- **最も優れたプロダクトワーク。** ちゃんと物語になっているユーザーストーリー。読み手を納得させるドキュメント。
+- **最も独創的な Claude Code の使い方。** サブエージェント、フック、スキル、私たちの予想を超える何か。
+- **ワイルドカード:** ベスト CI/CD、ベスト・レガシー考古学、ベスト「失敗したらどうなる」思考、品質を保ったまま最も多くのチャレンジを踏破したチーム、シナリオの要件に疑問を投げかけて*実際に正しかった*チーム。
 
 ---
 
-## README Template
+## 提出
 
-Copy this into your repo's `README.md` and fill it in as you go, not at the end.
+必要なのは次の3ファイルです。
+
+1. **`README.md`**。皆さんの物語を語ります。下のテンプレートを使ってください。
+2. **`CLAUDE.md`**。Claude Code に自分たちのやり方をどう教えたのかが分かるものを。
+3. **`presentation.html`**。Claude Code で作った HTML プレゼン資料。指名されたらすぐ発表できる状態にしておきます。日本語フォントには Noto Sans JP を使用してください(Anthropic Sans は日本語グリフに対応していないため)。
+
+**推奨:** 3ファイルをテーブル名とチーム名を冠したフォルダ(例: `Table1_SonnetSlayers/`)に入れ、セッションで案内されるリンクへフォルダごとアップロードしてください。
+
+**代替手段:** フォルダのアップロードができない場合は、同じ命名規則の zip アーカイブ(例: `Table1_SonnetSlayers.zip`)にまとめてアップロードしてください。
+
+いずれの場合も、**提出はチームにつき1回**です。
+
+**顧客データ・社内データの持ち込みは厳禁です。** 提出物はすべて、外部に共有しても差し支えないものにしてください。
+
+---
+
+## README テンプレート
+
+以下をリポジトリの `README.md` にコピーし、最後にまとめて書くのではなく、作業を進めながら埋めていってください。
 
 ```
-# Team <name>
+# Team <チーム名>
 
-## Participants
-- Name (role(s) played today)
-- Name (role(s) played today)
-- Name (role(s) played today)
+## 参加メンバー
+- 名前(今日担当した役割)
+- 名前(今日担当した役割)
+- 名前(今日担当した役割)
 
-## Scenario
-Scenario <#>: <title>
+## シナリオ
+シナリオ <番号>: <タイトル>
 
-## What We Built
-A couple of paragraphs. What exists in this repo that didn't exist when you
-started. What runs, what's scaffolding, what's faked.
+## 作ったもの
+数段落で。開始時には存在しなかった何がこのリポジトリにあるのか。
+動くもの、足場だけのもの、ダミーで済ませたものはどれか。
 
-## Challenges Attempted
-| # | Challenge | Status | Notes |
+## 取り組んだチャレンジ
+| # | チャレンジ | ステータス | 備考 |
 |---|---|---|---|
-| 1 | The <name> | done / partial / skipped | |
+| 1 | <チャレンジ名> | 完了 / 一部 / スキップ | |
 | 2 | | | |
 
-## Key Decisions
-Biggest calls you made and why. Link into `/decisions` for the full ADRs.
+## 重要な意思決定
+最も大きな判断とその理由。詳細な ADR は `/decisions` へのリンクで。
 
-## How to Run It
-Exact commands. Assume the reader has Docker and nothing else.
+## 実行方法
+正確なコマンドを。読み手の手元には Docker しかない前提で書いてください。
 
-## If We Had More Time
-What you'd tackle next, in priority order. Be honest about what's held
-together with tape.
+## もっと時間があったら
+次に取り組みたいことを優先度順に。継ぎはぎでしのいだ箇所は
+正直に書いてください。
 
-## How We Used Claude Code
-What worked. What surprised you. Where it saved the most time.
+## Claude Code をどう使ったか
+うまくいったこと。意外だったこと。最も時間を節約できた場面。
 ```
 
 ---
 
-**Pick a scenario. Start building.**
+**シナリオを選んで、さっそく作り始めましょう。**

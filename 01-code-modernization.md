@@ -1,66 +1,66 @@
-# Scenario 1. Code Modernization
+# シナリオ1. コードモダナイゼーション
 
-## "The Monolith"
+## 「モノリス」
 
-Northwind Logistics runs on something old. It works, mostly, but the people who built it are gone, the docs are a folder of outdated Word files, and the board just approved "modernization" without defining what that means. Prove it can be evolved safely without a big-bang rewrite.
+Northwind Logistics は古いシステムの上で動いています。おおむね動いてはいるものの、作った人たちはすでに会社を去り、ドキュメントといえば古びた Word ファイルの詰まったフォルダだけ。そして経営陣は、意味を定義しないまま「モダナイゼーション」を承認しました。ビッグバン・リライトに頼らず、安全に進化させられることを証明してください。
 
-You pick the language, the era, the architecture, the decomposition strategy. The only rule: generate something ugly enough that fixing it is interesting.
+言語も、時代設定も、アーキテクチャも、分割戦略も自由に選べます。ルールは1つだけ。直すのが面白くなるくらい醜いものを生成すること。
 
 ---
 
-## Pick Your Legacy (or invent your own)
+## レガシーを選ぶ(自作も歓迎)
 
-| Flavor | What Claude generates for you |
+| 系統 | Claude が生成してくれるもの |
 |---|---|
-| **PHP 5 monolith** | `index.php`, SQL strings concatenated inline, sessions in globals |
-| **Enterprise Java 2010** | Spring XML config, `AbstractSingletonProxyFactoryBean`, WAR on WebLogic |
-| **Stored-proc architecture** | 40 T-SQL procs that *are* the business logic, app is a thin shell |
-| **Early Node callback hell** | Express 3, callbacks 6 deep, logic in Mongoose pre-save hooks |
-| **Rails 2 majestic monolith** | Fat models, `lib/` doing unspeakable things, cron plus rake jobs |
-| **Classic ASP / VB6** | COM components, ADO recordsets, inline VBScript |
-| **SOAP service tangle** | WSDL files, an ESB that's actually just a queue |
-| **COBOL plus batch** | Fixed-width files, JCL, nightly batch that can't be interrupted |
+| **PHP 5 モノリス** | `index.php`、インラインで連結される SQL 文字列、グローバル変数に置かれたセッション |
+| **2010年頃のエンタープライズ Java** | Spring の XML 設定、`AbstractSingletonProxyFactoryBean`、WebLogic 上の WAR |
+| **ストアドプロシージャ・アーキテクチャ** | ビジネスロジック*そのもの*と化した40本の T-SQL プロシージャ。アプリは薄い殻 |
+| **初期 Node のコールバック地獄** | Express 3、6段ネストのコールバック、Mongoose の pre-save フックに潜むロジック |
+| **Rails 2 の荘厳なモノリス** | 肥大化したモデル、口に出せないことをしている `lib/`、cron と rake ジョブの組み合わせ |
+| **Classic ASP / VB6** | COM コンポーネント、ADO レコードセット、インライン VBScript |
+| **SOAP サービスのもつれ** | WSDL ファイルの山と、実態はただのキューでしかない ESB |
+| **COBOL とバッチ** | 固定長ファイル、JCL、中断できない夜間バッチ |
 
-**Modernize toward:** Strangler fig, containerize-and-ship, event-driven, API façade, serverless extraction, DB-first split. Your call.
-
----
-
-## Challenges
-
-Waypoints, not a checklist. Pick the ones you want to pursue.
-
-1. **The Stories.** *(PM)* User stories for the handful of business capabilities that actually matter. Acceptance criteria sharp enough that a tester could execute them. Stakeholders will disagree about priorities; capture those disagreements explicitly rather than smoothing them over. A crisp story set also makes it easier for Claude to scaffold tests from it later.
-
-2. **The Patient.** *(Architect)* Generate the legacy monolith. Shared database, circular dependencies, a god class or two, business logic hiding in a database trigger. Make it realistic, including the parts that make you wince. The ugliness is what makes everything downstream interesting. If you'd rather skip generation, use the BYO option below.
-
-3. **The Map.** *(Architect)* Your decomposition plan as an ADR, not a slide. Name the seams. Rank services by extraction risk rather than size. Include a "what we chose *not* to do" section. A three-level `CLAUDE.md` pays off here: user-level for personal preferences, project-level for codebase conventions, directory-level so the monolith root and the new-service root each get the context that fits them.
-
-4. **The Pin.** *(Tester)* Characterization tests against the monolith before anyone touches it. Not correctness tests, behavior-pinning tests, bugs included. When someone changes behavior unintentionally later, the failure message should tell them precisely what changed.
-
-5. **The Cut.** *(Dev)* Extract your first service with a clean API contract. The monolith still works, the service works, and both are provable from a single test run: the characterization suite plus a new contract test, green on the same commit.
-
-6. **The Fence.** *(Dev/Tester)* Between old and new, an anti-corruption layer. The monolith's data model must not leak into the new service's public shape. A test that fails loudly if a monolith field name ever appears in the new service's API is a good forcing function. If you also want to prevent Claude from writing across the boundary, a `PreToolUse` hook enforces it deterministically; pair it with a prompt in the project `CLAUDE.md` that says "prefer the new service for X," and write a short ADR on why the hard block is a hook and the preference is a prompt.
-
-7. **The Scorecard.** *(Quality)* An eval harness for the LLM-driven refactoring itself, because same prompt plus same module doesn't mean same output. A golden set of known-good extractions (labeled "correct seam" versus "incorrect seam" for modules you generated), plus the characterization suite as a behavior-preservation check. Metrics: does Claude propose the right boundaries, does the characterization suite still pass after Claude's refactor, and how often does it claim high confidence on a wrong answer. Runs in CI so every Claude-proposed change carries a defensible number, and the modernization workflow stops being a vibe.
-
-8. **The Weekend.** *(Stretch)* A cutover runbook ops will actually follow at 3am. Steps, rollback triggers, the decision tree. Rehearse it at least once so it isn't purely theoretical.
-
-9. **The Scouts.** *(Stretch, agentic)* Fan-out analysis with Task subagents. One subagent per candidate seam from The Map, each independently scoring extraction risk (coupling, test coverage, data-model tangle, business criticality) and reporting a structured verdict. A coordinator aggregates into a ranked list. Pass scope explicitly in each Task prompt, since subagents don't inherit the coordinator's context. Compare the agent-generated ranking against the human-written one from The Map and note where they agree, where they differ, and why.
+**モダナイズの方向性:** ストラングラーフィグ、コンテナ化してそのまま出荷、イベント駆動、API ファサード、サーバーレスへの切り出し、DB ファーストの分割。どれを選ぶかはお任せします。
 
 ---
 
-## Optional: Bring Your Own Monolith
+## チャレンジ
 
-Don't want to generate the legacy? We've got one.
+チェックリストではなく、道しるべです。追いかけたいものを選んでください。
+
+1. **ストーリー。** *(PM)* 本当に重要なビジネスケイパビリティに絞ったユーザーストーリー。テスターがそのまま実行できるくらい鋭い受け入れ基準を付けます。ステークホルダーの優先順位は食い違うはずです。丸く収めず、その食い違いを明示的に記録してください。切れ味のよいストーリーがあれば、後で Claude にそこからテストの足場を作らせるのも楽になります。
+
+2. **患者。** *(アーキテクト)* レガシーモノリスを生成します。共有データベース、循環依存、1つや2つのゴッドクラス、データベーストリガーに隠れたビジネスロジック。思わず顔をしかめる部分も含めて、リアルに作ってください。その醜さこそが、後続の作業すべてを面白くします。生成をスキップしたければ、下の「持ち込みモノリス」を使ってください。
+
+3. **地図。** *(アーキテクト)* 分割計画を、スライドではなく ADR として。継ぎ目(シーム)に名前を付け、サービスをサイズではなく切り出しリスクで順位付けします。「あえて*やらない*と決めたこと」のセクションも入れてください。ここで3階層の `CLAUDE.md` が効いてきます。ユーザーレベルには個人の好みを、プロジェクトレベルにはコードベースの規約を、そしてディレクトリレベルを使えば、モノリスのルートと新サービスのルートそれぞれに合ったコンテキストを与えられます。
+
+4. **ピン留め。** *(テスター)* 誰かが手を入れる前に、モノリスに対する特性テスト(characterization test)を書きます。正しさを確かめるテストではなく、バグも含めて現状の挙動を固定するテストです。後で誰かが意図せず挙動を変えてしまったとき、何が変わったのかを失敗メッセージが正確に教えてくれるようにします。
+
+5. **切り出し。** *(開発)* きれいな API コントラクトを備えた最初のサービスを切り出します。モノリスは動き続け、切り出したサービスも動き、その両方が1回のテスト実行で証明できること。特性テストスイートと新しいコントラクトテストが、同じコミットで揃ってグリーンになる状態がゴールです。
+
+6. **フェンス。** *(開発/テスター)* 新旧の間に腐敗防止層(anti-corruption layer)を設けます。モノリスのデータモデルが、新サービスの公開インターフェースに漏れ出してはいけません。モノリスのフィールド名が新サービスの API に現れた瞬間、派手に落ちるテストを置くと良い強制装置になります。Claude が境界をまたいで書き込むこと自体も防ぎたければ、`PreToolUse` フックで決定論的に強制できます。プロジェクトの `CLAUDE.md` には「X には新サービスを優先する」というプロンプトを添え、なぜハードブロックはフックで、優先の指示はプロンプトなのかを短い ADR にまとめてください。
+
+7. **スコアカード。** *(品質)* LLM によるリファクタリングそのものを測る eval ハーネス。同じプロンプトと同じモジュールでも、同じ出力が返るとは限らないからです。既知の正解となる切り出し例のゴールデンセット(生成したモジュールに「正しいシーム」「誤ったシーム」のラベルを付けたもの)に、挙動維持のチェックとして特性テストスイートを組み合わせます。メトリクスは3つ。Claude が正しい境界を提案できるか、Claude のリファクタリング後も特性テストが通り続けるか、そして誤答に高い確信度を示す頻度はどれくらいか。CI で回しておけば、Claude が提案するすべての変更に根拠ある数字が付き、モダナイゼーションの進め方が雰囲気任せでなくなります。
+
+8. **週末。** *(発展)* 運用チームが午前3時に本当に実行できるカットオーバー・ランブック。手順、ロールバックの発動条件、判断ツリー。机上の空論で終わらせないために、少なくとも1回はリハーサルしてください。
+
+9. **斥候。** *(発展、エージェント)* Task サブエージェントによるファンアウト分析。「地図」で挙げた候補シームごとにサブエージェントを1つ立て、それぞれが独立に切り出しリスク(結合度、テストカバレッジ、データモデルの絡まり具合、ビジネス上の重要度)を採点し、構造化された判定を返します。コーディネーターがそれをランキングに集約します。サブエージェントはコーディネーターのコンテキストを引き継がないため、スコープは各 Task プロンプトで明示的に渡してください。エージェントが作ったランキングを「地図」で人間が書いたものと突き合わせ、どこが一致し、どこが違い、なぜ違うのかを記録します。
+
+---
+
+## オプション: 持ち込みモノリス
+
+レガシーの生成は省きたい、という方にはこちらを用意しています。
 
 [https://github.com/rishikeshradhakrishnan/spring-music](https://github.com/rishikeshradhakrishnan/spring-music)
 
-Spring Music is a Spring Boot sample app built for Cloud Foundry. It stores the same domain objects across relational, document, and key-value stores using bean profiles and Spring Cloud Connectors. Fine to skip the generation challenge if you use it.
+Spring Music は Cloud Foundry 向けに作られた Spring Boot のサンプルアプリです。Bean プロファイルと Spring Cloud Connectors を使い、同じドメインオブジェクトをリレーショナル、ドキュメント、キーバリューの各ストアに保存します。これを使う場合、生成のチャレンジはスキップして構いません。
 
 ---
 
-**Cert domains this scenario stresses:**
+**このシナリオで鍛えられる認定試験ドメイン:**
 
-- **Claude Code Config.** Three-level `CLAUDE.md` across a multi-module legacy; custom commands plus skills for the extraction playbook.
-- **Context Management.** Hook plus prompt guidance for the service boundary, with an ADR explaining why each is which; stratified sampling and false-confidence rate on the refactoring eval (via The Scorecard).
-- **Agentic Architecture.** Task subagents to score extraction risk in parallel, with explicit context passed in each Task call (optional, via The Scouts).
+- **Claude Code の設定。** マルチモジュールのレガシーをまたぐ3階層の `CLAUDE.md`。切り出しプレイブックのためのカスタムコマンドとスキル。
+- **コンテキスト管理。** サービス境界を守るフックとプロンプトの併用、そしてどちらをどちらにしたかを説明する ADR。リファクタリング eval における層化サンプリングと誤確信率(「スコアカード」経由)。
+- **エージェントアーキテクチャ。** 切り出しリスクを並列で採点する Task サブエージェント。各 Task 呼び出しでの明示的なコンテキスト受け渡し(任意、「斥候」経由)。
